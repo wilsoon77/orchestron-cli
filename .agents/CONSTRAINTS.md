@@ -1,0 +1,60 @@
+# CONSTRAINTS.MD — INVIOLABLE QUALITY BAR & ANTI-DEGRADATION CONTRACT
+
+> Este documento define la barra mecanica de calidad innegociable para el proyecto **cli-orquestador-agent**.
+> Inspirado en el estandar de Constraint-Driven Development (Addy Osmani).
+> Los agentes tienen prohibido bajar estos estandares de forma silenciosa para forzar una aprobacion.
+
+---
+
+## 1. Reglas Absolutas Anti-Degradacion (Floor Inviolable)
+
+Todo agente o colaborador que proponga cambios en este repositorio debe respetar estrictamente:
+
+1. **Tolerancia Cero a Supresiones de Tipado y Linting:**
+   - PROHIBIDO agregar comentarios de supresion como `@ts-ignore`, `@ts-nocheck`, `@ts-expect-error` o `eslint-disable`.
+   - Si existe un error de tipos o linting, DEBE resolverse en la causa raiz (definiendo el tipo correcto o ajustando la logica), nunca silenciando el compilador.
+2. **Proteccion de la Suite de Pruebas:**
+   - PROHIBIDO eliminar pruebas unitarias o de integracion existentes.
+   - PROHIBIDO utilizar modificadores de exclusion como `.skip()`, `xit()` o comentar aserciones (`expect(...)`, `assert(...)`) para forzar un pase en verde.
+3. **Principio de Menor Impacto:**
+   - Modificar unicamente las lineas y archivos estrictamente necesarios para el requerimiento.
+   - PROHIBIDO reformatear archivos ajenos o reescribir logica no relacionada.
+4. **Cero Emojis:**
+   - Prohibido el uso de emojis en codigo fuente, comentarios, nombres de variables y mensajes de commit.
+
+---
+
+## 2. Presupuesto de Compilacion y Ejecucion (Gate 2)
+
+- **Comando de Compilacion:** `npm run build`
+  - Requisito: 0 errores de TypeScript / compilador.
+- **Comando de Pruebas:** `npm test`
+  - Requisito: 100% de pruebas pasando en verde sin omisiones.
+- **Presupuesto de Contexto:**
+  - El archivo maestro `.agents/AGENTS.md` debe mantenerse por debajo de 24 KB. Reglas extensas deben modularizarse en `.agents/rules/`.
+
+---
+
+## 3. Restricciones de Diseno, UI y Responsividad
+
+Para todo cambio que involucre interfaz de usuario:
+
+- **Touch Targets Optimos:** Botones y enlaces interactivos deben tener un area tactil minima de **44x44px** en pantallas tactiles (con padding defensivo).
+- **Control de Desbordamiento:** Cero scroll horizontal involuntario (`overflow-x`) en viewports de 360px a 1440px+.
+- **Estabilidad Visual (CLS):** Estados de carga deben usar skeletons con las mismas dimensiones que el contenido final para evitar saltos bruscos.
+- **Enfoque Mobile-First:** El layout debe ser solido en 360px antes de escalar con media queries a desktop.
+
+---
+
+## 4. Filosofia de Simplicidad ("Clarity Over Cleverness")
+
+- **Regla de las 3 Ocurrencias:** No crear factories, wrappers genericos ni capas intermedias de abstraccion hasta que el patron se repita en al menos 3 casos reales comprobables.
+- **Eliminar antes de Pulir:** Preferir siempre una refactorizacion que elimine conceptos, capas o bifurcaciones frente a una que simplemente traslade la complejidad de lugar.
+- **Codigo Conciso:** Si una tarea puede resolverse de forma limpia en 50 lineas con el framework estandar, una solucion de 300 lineas se considera fallida.
+
+---
+
+## 5. Mecanismo de Trinquete (Ratchet Policy)
+
+- La barra de calidad definida en este contrato solo puede **subir** (hacerse mas estricta), **nunca bajar**.
+- Cualquier cambio a este archivo requiere aprobacion explicita del usuario (Gate 1).

@@ -1,3 +1,17 @@
+---
+name: backend-dev
+description: "Use this subagent for Phase 3 (Backend Development) to implement APIs, services, controllers, and persistence layers adhering strictly to Gate 1 DTO contracts."
+tools:
+  - view_file
+  - replace_file_content
+  - write_to_file
+  - grep_search
+  - find_by_name
+  - run_command
+subagent: true
+model: pro
+commandExecutionPolicy: sandbox
+---
 # Subagent Contract: Backend Specialist
 
 ## Rol y Meta

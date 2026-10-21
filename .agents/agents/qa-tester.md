@@ -1,3 +1,15 @@
+---
+name: qa-tester
+description: "Use this subagent for Gate 2 (Verification) to run builds and test suites in an isolated context and synthesize error logs with noise shielding."
+tools:
+  - view_file
+  - grep_search
+  - find_by_name
+  - run_command
+subagent: true
+model: flash
+commandExecutionPolicy: sandbox
+---
 # Subagent Contract: QA & Verification Specialist
 
 ## Rol y Meta

@@ -8,7 +8,7 @@ kind: Workspace
 metadata:
   name: cli-orquestador-agent
   version: "1.0.0"
-  createdAt: "2026-10-06"
+  createdAt: "2026-10-21"
 
 spec:
   # 1. Stack & Pre-wired Environment
@@ -23,25 +23,7 @@ spec:
   # 2. Tool Bindings & External MCP Providers
   tools:
     mcpServers:
-      - name: atlassian-mcp-server
-        access: enabled
-      - name: chrome_devtools
-        access: enabled
-      - name: ClickUp
-        access: enabled
       - name: context7
-        access: enabled
-      - name: figma-developer-mcp
-        access: read-only-design-tokens
-      - name: mcp-server-neon
-        access: read-only-during-analysis
-      - name: mysql-local
-        access: read-only-during-analysis
-      - name: notion-mcp-server
-        access: enabled
-      - name: StitchMCP
-        access: enabled
-      - name: supabase
         access: enabled
     skills:
       - archify
@@ -54,89 +36,91 @@ spec:
       - migrate-workflows
       - permissioned-github
       - plugin
-      - ui-extension
       - ui-plugin-navigation
 
   # 3. Security Gateway: Tool Permissions per Role (Google AX Gateway Pattern)
   gateway:
     policies:
-      - role: code-reviewer
-        allowedTools:
-          - read_file
-          - view_file
-          - "run_command:git diff"
-          - "run_command:git status"
-        forbiddenActions:
-          - modify_source_code
-          - approve_suppressed_errors
-
       - role: lead-architect
         allowedTools:
-          - read_file
           - view_file
-          - search_web
+          - grep_search
+          - find_by_name
           - read_url_content
-          - "mysql_query:SELECT"
+          - search_web
         forbiddenActions:
           - modify_source_code_before_gate1
           - destructive_shell_commands
 
       - role: backend-dev
         allowedTools:
-          - read_file
           - view_file
-          - write_to_file
           - replace_file_content
-          - run_command:local_dev
+          - write_to_file
+          - grep_search
+          - find_by_name
+          - run_command
         forbiddenActions:
           - modify_frontend_views_directly
           - commit_secrets
 
       - role: qa-tester
         allowedTools:
-          - run_command:build
-          - run_command:test
-          - run_command:lint
-          - read_file
           - view_file
+          - grep_search
+          - find_by_name
+          - run_command
         forbiddenActions:
           - modify_business_logic_to_force_test_pass
 
+      - role: code-reviewer
+        allowedTools:
+          - view_file
+          - grep_search
+          - find_by_name
+          - run_command
+        forbiddenActions:
+          - modify_source_code
+          - approve_suppressed_errors
+
       - role: git-security
         allowedTools:
-          - run_command:git
-          - read_file
           - view_file
+          - replace_file_content
+          - write_to_file
+          - grep_search
+          - find_by_name
+          - run_command
         forbiddenActions:
           - git_push_force
           - version_env_files
 
   # 4. Declarative Subagent Swarm Configuration (Teamwork / Parallel Spawns)
   subagents:
-    - id: code-reviewer
-      name: "Code Reviewer & Quality Auditor"
-      promptFile: ".agents/subagents/reviewer.agent.md"
-      workspaceMode: "inherit"
-
     - id: lead-architect
-      name: "Lead Architect"
-      promptFile: ".agents/subagents/architect.agent.md"
+      name: "Lead Architect & Planner"
+      promptFile: ".agents/agents/lead-architect.md"
       workspaceMode: "inherit"
       canForkParallelTeam: true
 
     - id: backend-dev
       name: "Backend Specialist"
-      promptFile: ".agents/subagents/backend.agent.md"
+      promptFile: ".agents/agents/backend-dev.md"
       workspaceMode: "branch"
 
     - id: qa-tester
       name: "QA & Verification Specialist"
-      promptFile: ".agents/subagents/qa.agent.md"
+      promptFile: ".agents/agents/qa-tester.md"
+      workspaceMode: "inherit"
+
+    - id: code-reviewer
+      name: "Code Reviewer & Quality Auditor"
+      promptFile: ".agents/agents/code-reviewer.md"
       workspaceMode: "inherit"
 
     - id: git-security
       name: "Git & Security Auditor"
-      promptFile: ".agents/subagents/security.agent.md"
+      promptFile: ".agents/agents/git-security.md"
       workspaceMode: "inherit"
 
   # 5. Quality Gates & Acceptance Criteria

@@ -54,6 +54,44 @@ export interface RoleConfig {
   rules: string[];
 }
 
+export interface UnifiedRoleDefinition {
+  id: string;
+  name: string;
+  category: 'core' | 'extended' | 'custom';
+  description: string;
+  responsibility: string;
+  deliverable: string;
+  skills: string[];
+  toolsAntigravity: string[];
+  toolsClaude: string[];
+  isolationClaude?: 'worktree' | 'none';
+  modelPreference?: string;
+  commandExecutionPolicy?: 'orchestrator_only' | 'autonomous' | 'review_required';
+  ruleTemplate: (config: OrchestronConfig) => string;
+  subagentTemplateAntigravity: (config: OrchestronConfig) => string;
+  subagentTemplateClaude?: (config: OrchestronConfig) => string;
+  cursorRuleTemplate?: (config: OrchestronConfig) => string;
+
+  // Ergonomic extensions for TUI, Gateway Swarm and CLI
+  title?: string;
+  icon?: string;
+  goal?: string;
+  responsibilities?: string[];
+  rules?: string[];
+  workspaceMode?: 'inherit' | 'branch' | 'share';
+  specialty?: string;
+  forbiddenActions?: string[];
+  canForkParallelTeam?: boolean;
+  agentFileName?: string;
+  ruleFileName?: string;
+  ruleTrigger?: 'glob' | 'model_decision' | 'always_on' | 'manual';
+  ruleGlobs?: string;
+  modelAntigravity?: 'pro' | 'flash' | 'inherit';
+  modelClaude?: 'opus' | 'sonnet' | 'haiku' | 'inherit';
+  isExtended?: boolean;
+  isCustom?: boolean;
+}
+
 export interface OrchestronConfig {
   projectName: string;
   stack: ProjectStack;
@@ -77,6 +115,9 @@ export interface OrchestronConfig {
     fileName: string; // 'CONTEXT.md'
     autoUpdateOnFinish: boolean;
   };
+  rawCustomPolicies?: string[];
+  rawCustomSubagents?: string[];
+  customRoles?: UnifiedRoleDefinition[];
 }
 
 // Declarative Manifest Specifications (Inspired by Google AX)
@@ -92,6 +133,7 @@ export interface ManifestSubagent {
   promptFile: string;
   workspaceMode: 'inherit' | 'branch' | 'share';
   allowedRolesToInvoke?: string[];
+  canForkParallelTeam?: boolean;
 }
 
 export interface OrchestronManifest {
@@ -122,6 +164,7 @@ export interface OrchestronManifest {
       policies: ManifestGatewayPolicy[];
     };
     subagents: ManifestSubagent[];
+    customRoles?: UnifiedRoleDefinition[];
     qualityGates: {
       gate1_userApproval: string;
       gate2_zeroCompilationErrors: string;

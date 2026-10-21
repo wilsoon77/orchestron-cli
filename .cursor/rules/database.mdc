@@ -1,0 +1,16 @@
+---
+description: "Directiva de Base de Datos para SQL. Integridad referencial, scripts de migracion versionados y solo SELECT en analisis."
+globs: "**/*.sql, **/migrations/**, **/prisma/**, **/schema/**, **/entities/**, **/models/**"
+alwaysApply: false
+---
+
+# Directiva de Base de Datos: Relacional / SQL
+
+## Principios de Persistencia y Acceso a Datos
+1. **Integridad Referencial:** Respetar relaciones foraneas y tipos de datos definidos en el esquema.
+2. **Consultas en Fase de Analisis:** Durante el diseno y analisis tecnico, unicamente ejecutar consultas de lectura (`SELECT`).
+3. **Cambios Estructurales:**
+   - Prohibido alterar tablas en vivo de forma descontrolada.
+   - Cualquier cambio debe formalizarse como un script de migracion SQL versionado (`V...__descripcion.sql` o similar).
+
+

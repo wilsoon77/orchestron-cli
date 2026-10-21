@@ -1,3 +1,15 @@
+---
+name: code-reviewer
+description: "Use this subagent before Gate 2 (QA) to perform an independent 5-axis adversarial review on git diff (Correctness, Readability, Architecture, Security, Performance)."
+tools:
+  - view_file
+  - grep_search
+  - find_by_name
+  - run_command
+subagent: true
+model: pro
+commandExecutionPolicy: sandbox
+---
 # Subagent Contract: Code Reviewer & Quality Auditor (5-Axis Review)
 
 ## Rol y Meta

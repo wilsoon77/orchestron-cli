@@ -1,7 +1,147 @@
 import { OrchestronConfig } from '../../types/index.js';
 
-export function renderArchitectSubagent(config: OrchestronConfig): string {
-  return `# Subagent Contract: Lead Architect & Coordinator
+export interface SubagentPlatformMeta {
+  id: string;
+  name: string;
+  description: string;
+  toolsAntigravity: string[];
+  modelAntigravity: 'pro' | 'flash' | 'inherit';
+  policyAntigravity: 'orchestrator_only' | 'sandbox' | 'auto' | 'off';
+  toolsClaude: string;
+  modelClaude: 'opus' | 'sonnet' | 'haiku' | 'inherit';
+  isolationClaude?: 'worktree' | 'none';
+}
+
+export const SUBAGENT_PLATFORMS: Record<string, SubagentPlatformMeta> = {
+  'lead-architect': {
+    id: 'lead-architect',
+    name: 'Lead Architect',
+    description: 'Use this subagent for Phase 1 & 2 (Analysis & Technical Planning) to decompose requirements into immutable DTO contracts, REST endpoints, and step-by-step execution plans before Gate 1 approval.',
+    toolsAntigravity: ['view_file', 'grep_search', 'find_by_name', 'read_url_content', 'search_web'],
+    modelAntigravity: 'pro',
+    policyAntigravity: 'orchestrator_only',
+    toolsClaude: 'Read, Grep, Glob',
+    modelClaude: 'opus',
+    isolationClaude: 'none'
+  },
+  'backend-dev': {
+    id: 'backend-dev',
+    name: 'Backend Specialist',
+    description: 'Use this subagent for Phase 3 (Backend Development) to implement APIs, services, controllers, and persistence layers adhering strictly to Gate 1 DTO contracts.',
+    toolsAntigravity: ['view_file', 'replace_file_content', 'write_to_file', 'grep_search', 'find_by_name', 'run_command'],
+    modelAntigravity: 'pro',
+    policyAntigravity: 'sandbox',
+    toolsClaude: 'Read, Write, Edit, Bash, Grep, Glob',
+    modelClaude: 'sonnet',
+    isolationClaude: 'worktree'
+  },
+  'frontend-dev': {
+    id: 'frontend-dev',
+    name: 'Frontend Specialist',
+    description: 'Use this subagent for Phase 3 (Frontend Development) to implement UI components, client state management, and HTTP API integration following approved contracts.',
+    toolsAntigravity: ['view_file', 'replace_file_content', 'write_to_file', 'grep_search', 'find_by_name', 'run_command'],
+    modelAntigravity: 'pro',
+    policyAntigravity: 'sandbox',
+    toolsClaude: 'Read, Write, Edit, Bash, Grep, Glob',
+    modelClaude: 'sonnet',
+    isolationClaude: 'worktree'
+  },
+  'ui-ux-specialist': {
+    id: 'ui-ux-specialist',
+    name: 'UI/UX & Responsive Layout Specialist',
+    description: 'Use this subagent to audit and fix UI ergonomics, responsive layout breakpoints (360px-1440px+), touch targets (>=44x44px), and eliminate overflow-x.',
+    toolsAntigravity: ['view_file', 'replace_file_content', 'write_to_file', 'grep_search', 'find_by_name'],
+    modelAntigravity: 'pro',
+    policyAntigravity: 'sandbox',
+    toolsClaude: 'Read, Write, Edit, Grep, Glob',
+    modelClaude: 'sonnet',
+    isolationClaude: 'worktree'
+  },
+  'code-reviewer': {
+    id: 'code-reviewer',
+    name: 'Code Reviewer & Quality Auditor',
+    description: 'Use this subagent before Gate 2 (QA) to perform an independent 5-axis adversarial review on git diff (Correctness, Readability, Architecture, Security, Performance).',
+    toolsAntigravity: ['view_file', 'grep_search', 'find_by_name', 'run_command'],
+    modelAntigravity: 'pro',
+    policyAntigravity: 'sandbox',
+    toolsClaude: 'Read, Grep, Glob, Bash',
+    modelClaude: 'opus',
+    isolationClaude: 'none'
+  },
+  'qa-tester': {
+    id: 'qa-tester',
+    name: 'QA & Verification Specialist',
+    description: 'Use this subagent for Gate 2 (Verification) to run builds and test suites in an isolated context and synthesize error logs with noise shielding.',
+    toolsAntigravity: ['view_file', 'grep_search', 'find_by_name', 'run_command'],
+    modelAntigravity: 'flash',
+    policyAntigravity: 'sandbox',
+    toolsClaude: 'Read, Grep, Glob, Bash',
+    modelClaude: 'haiku',
+    isolationClaude: 'none'
+  },
+  'git-security': {
+    id: 'git-security',
+    name: 'Git & Security Auditor',
+    description: 'Use this subagent for Gate 3 (Closure) to audit git hygiene, ensure zero secrets or local configs are committed, and update living context (CONTEXT.md).',
+    toolsAntigravity: ['view_file', 'replace_file_content', 'write_to_file', 'grep_search', 'find_by_name', 'run_command'],
+    modelAntigravity: 'inherit',
+    policyAntigravity: 'sandbox',
+    toolsClaude: 'Read, Write, Edit, Bash, Grep, Glob',
+    modelClaude: 'haiku',
+    isolationClaude: 'none'
+  },
+  'devops-infra': {
+    id: 'devops-infra',
+    name: 'DevOps & Cloud Specialist',
+    description: 'Use this subagent for containerization, Docker configurations, CI/CD pipelines, and infrastructure as code.',
+    toolsAntigravity: ['view_file', 'replace_file_content', 'write_to_file', 'grep_search', 'find_by_name', 'run_command'],
+    modelAntigravity: 'pro',
+    policyAntigravity: 'sandbox',
+    toolsClaude: 'Read, Write, Edit, Bash, Grep, Glob',
+    modelClaude: 'sonnet',
+    isolationClaude: 'worktree'
+  }
+};
+
+export function buildFrontmatter(meta: SubagentPlatformMeta, platform: 'antigravity' | 'claude'): string {
+  if (platform === 'claude') {
+    const lines = [
+      '---',
+      `name: ${meta.id}`,
+      `description: "${meta.description.replace(/"/g, '\\"')}"`,
+      `tools: ${meta.toolsClaude}`,
+      `model: ${meta.modelClaude}`
+    ];
+    if (meta.isolationClaude && meta.isolationClaude !== 'none') {
+      lines.push(`isolation: ${meta.isolationClaude}`);
+    }
+    lines.push('---', '');
+    return lines.join('\n');
+  }
+
+  // Google Antigravity format
+  const toolsFormatted = meta.toolsAntigravity.map((t) => `  - ${t}`).join('\n');
+  const lines = [
+    '---',
+    `name: ${meta.id}`,
+    `description: "${meta.description.replace(/"/g, '\\"')}"`,
+    'tools:',
+    toolsFormatted,
+    'subagent: true',
+    `model: ${meta.modelAntigravity}`,
+    `commandExecutionPolicy: ${meta.policyAntigravity}`,
+    '---',
+    ''
+  ];
+  return lines.join('\n');
+}
+
+export function renderArchitectSubagent(
+  _config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['lead-architect'], platform);
+  return `${frontmatter}# Subagent Contract: Lead Architect & Coordinator
 
 ## Rol y Meta
 Eres el **Arquitecto Lider**. Tu mision es analizar requerimientos complejos, descomponerlos en contratos inmutables (DTOs, firmas REST, diagramas de flujo) y orquestar el equipo.
@@ -19,9 +159,13 @@ Eres el **Arquitecto Lider**. Tu mision es analizar requerimientos complejos, de
 `;
 }
 
-export function renderBackendSubagent(config: OrchestronConfig): string {
+export function renderBackendSubagent(
+  config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
   const b = config.stack.backend;
-  return `# Subagent Contract: Backend Specialist
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['backend-dev'], platform);
+  return `${frontmatter}# Subagent Contract: Backend Specialist
 
 ## Rol y Meta
 Eres el **Especialista en Backend (${b?.framework || 'API'} - ${b?.language || 'TypeScript / Java'})**. Implementas la logica de negocio, persistencia y controladores de acuerdo a la especificacion del Arquitecto.
@@ -34,9 +178,13 @@ Eres el **Especialista en Backend (${b?.framework || 'API'} - ${b?.language || '
 `;
 }
 
-export function renderFrontendSubagent(config: OrchestronConfig): string {
+export function renderFrontendSubagent(
+  config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
   const f = config.stack.frontend;
-  return `# Subagent Contract: Frontend Specialist
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['frontend-dev'], platform);
+  return `${frontmatter}# Subagent Contract: Frontend Specialist
 
 ## Rol y Meta
 Eres el **Especialista en Frontend (${f?.framework || 'Web SPA'} ${f?.uiLibrary ? `- ${f.uiLibrary}` : ''})**. Implementas los componentes, servicios de comunicacion HTTP y la logica de estado del cliente.
@@ -49,9 +197,13 @@ Eres el **Especialista en Frontend (${f?.framework || 'Web SPA'} ${f?.uiLibrary 
 `;
 }
 
-export function renderUiUxSubagent(config: OrchestronConfig): string {
+export function renderUiUxSubagent(
+  config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
   const f = config.stack.frontend;
-  return `# Subagent Contract: UI/UX & Responsive Layout Specialist
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['ui-ux-specialist'], platform);
+  return `${frontmatter}# Subagent Contract: UI/UX & Responsive Layout Specialist
 
 ## Rol y Meta
 Eres el **Especialista en UI/UX y Responsividad Multi-Pantalla**. Tu objetivo es erradicar fallos de maquetacion, botones rotos o inaccesibles, espaciados colapsados y asegurar adaptabilidad impecable en cualquier dispositivo.
@@ -76,9 +228,13 @@ Eres el **Especialista en UI/UX y Responsividad Multi-Pantalla**. Tu objetivo es
 `;
 }
 
-export function renderQaSubagent(config: OrchestronConfig): string {
+export function renderQaSubagent(
+  config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
   const cmd = config.stack.commands;
-  return `# Subagent Contract: QA & Verification Specialist
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['qa-tester'], platform);
+  return `${frontmatter}# Subagent Contract: QA & Verification Specialist
 
 ## Rol y Meta
 Eres el **Especialista en QA, Compilacion y Verificacion**. Eres el guardian del Gate 2: garantizas que todo el codigo generado compila limpiamente sin romper nada.
@@ -92,21 +248,29 @@ Eres el **Especialista en QA, Compilacion y Verificacion**. Eres el guardian del
 `;
 }
 
-export function renderSecuritySubagent(config: OrchestronConfig): string {
-  return `# Subagent Contract: Git & Security Auditor
+export function renderSecuritySubagent(
+  _config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['git-security'], platform);
+  return `${frontmatter}# Subagent Contract: Git & Security Auditor
 
 ## Rol y Meta
 Eres el **Auditor de Git, Seguridad e Higiene**. Eres el guardian del Gate 3: aseguras la limpieza del repositorio y la preservacion de la memoria viva.
 
 ## Protocolo de Cierre (Gate 3)
 1. **Auditoria de Secretos:** Verificar que \`git status\` no contenga archivos \`.env*\`, credenciales, llaves privadas ni dumps temporales.
-2. **Técnica skip-worktree:** Confirmar que los entornos locales protegidos no esten marcados como modificados para commit.
+2. **Tecnica skip-worktree:** Confirmar que los entornos locales protegidos no esten marcados como modificados para commit.
 3. **Actualizacion de Living Context:** Antes de dar el ticket por cerrado, verificar o actualizar la bitacora en \`.agents/CONTEXT.md\` documentando los componentes nuevos entregados.
 `;
 }
 
-export function renderReviewerSubagent(config: OrchestronConfig): string {
-  return `# Subagent Contract: Code Reviewer & Quality Auditor (5-Axis Review)
+export function renderReviewerSubagent(
+  _config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['code-reviewer'], platform);
+  return `${frontmatter}# Subagent Contract: Code Reviewer & Quality Auditor (5-Axis Review)
 
 ## Rol y Meta
 Eres el **Auditor de Calidad y Revision de Codigo Desacoplado**. Tu mision es auditar de forma independiente y adversarial el \`git diff\` antes del Gate 2 (QA), evaluando los 5 ejes de calidad senior: Correctitud, Legibilidad, Arquitectura, Seguridad y Rendimiento.
@@ -151,5 +315,23 @@ Eres el **Auditor de Calidad y Revision de Codigo Desacoplado**. Tu mision es au
 ## Reglas Inviolables
 1. **PROHIBIDO modificar codigo directamente.** Tu entregable es un reporte de revision estructurado con veredicto claro: \`APROBADO\` o \`CAMBIOS SOLICITADOS\` (con los remedios estructurales precisos).
 2. **Tolerancia Cero a Anti-Patrones de Degradacion:** Si el diff introduce \`@ts-ignore\`, \`@ts-nocheck\` o \`eslint-disable\`, debes emitir veredicto \`BLOQUEADO\` de inmediato.
+`;
+}
+
+export function renderDevopsSubagent(
+  _config: OrchestronConfig,
+  platform: 'antigravity' | 'claude' = 'antigravity'
+): string {
+  const frontmatter = buildFrontmatter(SUBAGENT_PLATFORMS['devops-infra'], platform);
+  return `${frontmatter}# Subagent Contract: DevOps & Cloud Specialist
+
+## Rol y Meta
+Eres el **Especialista en DevOps, Infraestructura y Cloud**. Tu mision es disenar y mantener configuraciones de contenedores (Docker, docker-compose), automatizar pipelines de CI/CD y asegurar la seguridad de despliegue.
+
+## Protocolo de Ejecucion
+1. **Contenedores Ligeros:** Usar imagenes base reducidas y seguras (alpine, distroless, slim) y multi-stage builds.
+2. **Seguridad de Puertos y Redes:** Prohibido exponer puertos de base de datos directamente a redes externas sin segregacion o autenticacion.
+3. **Usuarios sin privilegios:** Configurar contenedores para ejecucion con usuarios no root.
+4. **Higiene de Secretos:** Nunca incrustar credenciales o claves privadas en Dockerfiles o scripts de despliegue.
 `;
 }

@@ -1,5 +1,11 @@
 import { OrchestronConfig } from '../../types/index.js';
 import { DEFAULT_ROLES } from '../../roles/catalog.js';
+import {
+  filterMcpServersForProject,
+  renderMcpServerContract
+} from '../../detector/mcp.js';
+
+export { renderGatewayRouter } from './gatewayRouterTemplate.js';
 
 export function renderAgentsMd(config: OrchestronConfig): string {
   const stack = config.stack;
@@ -9,24 +15,17 @@ export function renderAgentsMd(config: OrchestronConfig): string {
   const backendCompile = stack.commands.build || 'npm run build';
   const testCmd = stack.commands.test || 'npm test';
 
+  // Apply selective semantic filtering to MCPs
+  const rawMcps = stack.detectedMcps || [];
+  const filteredMcps = filterMcpServersForProject(rawMcps, stack);
+
   let mcpSection = '';
-  if (stack.detectedMcps && stack.detectedMcps.length > 0) {
+  if (filteredMcps.length > 0) {
     mcpSection = `
 ## 6. Contratos de Herramientas y Servidores MCP
 
 Los agentes de IA cuentan con acceso a herramientas externas mediante MCP (Model Context Protocol):
-${stack.detectedMcps
-  .map(
-    (mcp) => `
-### Servidor MCP: \`${mcp.name}\`
-- **Descripcion:** ${mcp.description}
-- **Herramientas disponibles:** ${mcp.tools.length > 0 ? mcp.tools.map((t) => `\`${t}\``).join(', ') : 'Acceso habilitado'}
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. \`SELECT\` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-`
-  )
-  .join('')}
+${filteredMcps.map((mcp) => renderMcpServerContract(mcp)).join('\n')}
 `;
   }
 

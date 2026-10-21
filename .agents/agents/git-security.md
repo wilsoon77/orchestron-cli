@@ -1,3 +1,17 @@
+---
+name: git-security
+description: "Use this subagent for Gate 3 (Closure) to audit git hygiene, ensure zero secrets or local configs are committed, and update living context (CONTEXT.md)."
+tools:
+  - view_file
+  - replace_file_content
+  - write_to_file
+  - grep_search
+  - find_by_name
+  - run_command
+subagent: true
+model: inherit
+commandExecutionPolicy: sandbox
+---
 # Subagent Contract: Git & Security Auditor
 
 ## Rol y Meta

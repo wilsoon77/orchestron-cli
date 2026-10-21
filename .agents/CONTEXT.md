@@ -45,6 +45,22 @@
 
 *Esta seccion es mantenida activamente por los agentes de IA al concluir tareas:*
 
+### [2026-10-21] — Lanzamiento de Orchestron CLI v2.0 (Resolucion Integral de Auditoria Arquitectonica)
+- **Autor / Rol:** Lead Architect, Backend Specialist & QA Specialist
+- **Cambios Realizados:**
+  - Compatibilidad nativa multi-motor: YAML frontmatter valido en `.agents/rules/*.md` (`trigger: glob | model_decision`), subagentes nativos en `.agents/agents/<id>.md` (Antigravity), `.claude/agents/<id>.md` (Claude Code) y `.cursor/rules/*.mdc` (Cursor IDE).
+  - Gateway Router minimo: `AGENTS.md` raiz reestructurado (< 5 KB base, 7.4 KB expandido frente a 30.5 KB previos), erradicando el truncamiento del presupuesto de 24 KB.
+  - Filtrado semantico MCP: Eliminacion del volcado de 11.5 KB de servidores globales irrelevantes; vinculacion contextual segun stack detectado.
+  - Catálogo unificado: `UnifiedRoleDefinition` como fuente unica de verdad en `src/roles/unifiedCatalog.ts`, con sincronizacion atomica en `orchestron add-role`.
+  - Persistencia en actualizacion: `orchestron update` lee `.agents/orchestron.yaml` sin sobreescribir roles personalizados ni `CONTEXT.md`, con soporte `--dry-run`.
+  - Hooks deterministas: Soporte de `.claude/settings.json` y comando `orchestron hooks --install` para `.git/hooks/pre-commit`.
+  - Artefacto fisico Gate 1 en `.agents/state/active-contract.md` para coordinacion de subagentes en contextos aislados.
+  - Optimizacion en Doctor: Conteo de llaves balanceadas para analisis N+1, soporte de flags `--ci` y `--json`, y asignacion de `process.exitCode = 1` ante fallos.
+  - Atajos de teclado instantaneos en `orchestron menu`.
+  - Suite de pruebas automatizadas con Vitest: 8 archivos de pruebas (unitarias, limites, combinaciones, escenarios reales) con 87/87 pruebas pasando al 100%.
+- **Proximos Pasos Recomendados:**
+  - Ejecutar `orchestron update` en proyectos existentes para beneficiarse de la compatibilidad multi-motor y el ahorro de tokens.
+
 ### [2026-10-06] — Evolucion con ECC & Addy Osmani Agent Skills + Actualizacion No Destructiva
 - **Autor / Rol:** Lead Architect & Developer
 - **Cambios Realizados:**

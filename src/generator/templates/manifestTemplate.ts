@@ -1,4 +1,5 @@
 import { OrchestronConfig } from '../../types/index.js';
+import { getUnifiedRole } from '../../roles/unifiedCatalog.js';
 
 export function renderOrchestronManifest(config: OrchestronConfig): string {
   const stack = config.stack;
@@ -19,129 +20,47 @@ export function renderOrchestronManifest(config: OrchestronConfig): string {
       ? stack.detectedSkills.map((s) => `      - ${s}`).join('\n')
       : '      []';
 
-  const gatewayPoliciesMap: Record<string, string> = {
-    'lead-architect': `      - role: lead-architect
+  const renderedPolicies: string[] = [];
+  const renderedSubagents: string[] = [];
+
+  for (const roleId of config.selectedRoles) {
+    const role = getUnifiedRole(roleId);
+    if (!role) continue;
+
+    const allowedToolsList = role.toolsAntigravity.length > 0
+      ? role.toolsAntigravity.map((t) => `          - ${t}`).join('\n')
+      : '          - view_file';
+
+    const forbiddenList = (role.forbiddenActions && role.forbiddenActions.length > 0 ? role.forbiddenActions : ['destructive_shell_commands', 'version_env_files'])
+      .map((a) => `          - ${a}`)
+      .join('\n');
+
+    renderedPolicies.push(`      - role: ${role.id}
         allowedTools:
-          - read_file
-          - view_file
-          - search_web
-          - read_url_content
-          - "mysql_query:SELECT"
+${allowedToolsList}
         forbiddenActions:
-          - modify_source_code_before_gate1
-          - destructive_shell_commands`,
+${forbiddenList}`);
 
-    'backend-dev': `      - role: backend-dev
-        allowedTools:
-          - read_file
-          - view_file
-          - write_to_file
-          - replace_file_content
-          - run_command:local_dev
-        forbiddenActions:
-          - modify_frontend_views_directly
-          - commit_secrets`,
+    renderedSubagents.push(`    - id: ${role.id}
+      name: "${role.name}"
+      promptFile: ".agents/agents/${role.agentFileName || `${role.id}.md`}"
+      workspaceMode: "${role.workspaceMode || 'branch'}"${role.canForkParallelTeam ? '\n      canForkParallelTeam: true' : ''}`);
+  }
 
-    'frontend-dev': `      - role: frontend-dev
-        allowedTools:
-          - read_file
-          - view_file
-          - write_to_file
-          - replace_file_content
-          - run_command:local_dev
-        forbiddenActions:
-          - modify_backend_endpoints_directly
-          - bypass_responsive_checks`,
+  if (config.rawCustomPolicies && config.rawCustomPolicies.length > 0) {
+    for (const rawPol of config.rawCustomPolicies) {
+      renderedPolicies.push(rawPol.startsWith('      ') ? rawPol : `      ${rawPol}`);
+    }
+  }
 
-    'ui-ux-specialist': `      - role: ui-ux-specialist
-        allowedTools:
-          - read_file
-          - view_file
-          - write_to_file
-          - replace_file_content
-          - figma_data
-          - generative_ui
-        forbiddenActions:
-          - modify_database_or_backend_logic
-          - introduce_inconsistent_palette_colors`,
+  if (config.rawCustomSubagents && config.rawCustomSubagents.length > 0) {
+    for (const rawSub of config.rawCustomSubagents) {
+      renderedSubagents.push(rawSub.startsWith('    ') ? rawSub : `    ${rawSub}`);
+    }
+  }
 
-    'code-reviewer': `      - role: code-reviewer
-        allowedTools:
-          - read_file
-          - view_file
-          - "run_command:git diff"
-          - "run_command:git status"
-        forbiddenActions:
-          - modify_source_code
-          - approve_suppressed_errors`,
-
-    'qa-tester': `      - role: qa-tester
-        allowedTools:
-          - run_command:build
-          - run_command:test
-          - run_command:lint
-          - read_file
-          - view_file
-        forbiddenActions:
-          - modify_business_logic_to_force_test_pass`,
-
-    'git-security': `      - role: git-security
-        allowedTools:
-          - run_command:git
-          - read_file
-          - view_file
-        forbiddenActions:
-          - git_push_force
-          - version_env_files`
-  };
-
-  const subagentsDefMap: Record<string, string> = {
-    'lead-architect': `    - id: lead-architect
-      name: "Lead Architect"
-      promptFile: ".agents/subagents/architect.agent.md"
-      workspaceMode: "inherit"
-      canForkParallelTeam: true`,
-
-    'backend-dev': `    - id: backend-dev
-      name: "Backend Specialist"
-      promptFile: ".agents/subagents/backend.agent.md"
-      workspaceMode: "branch"`,
-
-    'frontend-dev': `    - id: frontend-dev
-      name: "Frontend Specialist"
-      promptFile: ".agents/subagents/frontend.agent.md"
-      workspaceMode: "branch"`,
-
-    'ui-ux-specialist': `    - id: ui-ux-specialist
-      name: "UI/UX & Responsive Specialist"
-      promptFile: ".agents/subagents/ui-ux.agent.md"
-      workspaceMode: "share"`,
-
-    'code-reviewer': `    - id: code-reviewer
-      name: "Code Reviewer & Quality Auditor"
-      promptFile: ".agents/subagents/reviewer.agent.md"
-      workspaceMode: "inherit"`,
-
-    'qa-tester': `    - id: qa-tester
-      name: "QA & Verification Specialist"
-      promptFile: ".agents/subagents/qa.agent.md"
-      workspaceMode: "inherit"`,
-
-    'git-security': `    - id: git-security
-      name: "Git & Security Auditor"
-      promptFile: ".agents/subagents/security.agent.md"
-      workspaceMode: "inherit"`
-  };
-
-  const activePolicies = config.selectedRoles
-    .filter((roleId) => gatewayPoliciesMap[roleId])
-    .map((roleId) => gatewayPoliciesMap[roleId])
-    .join('\n\n');
-
-  const activeSubagentsYaml = config.selectedRoles
-    .filter((roleId) => subagentsDefMap[roleId])
-    .map((roleId) => subagentsDefMap[roleId])
-    .join('\n\n');
+  const activePolicies = renderedPolicies.join('\n\n');
+  const activeSubagentsYaml = renderedSubagents.join('\n\n');
 
   return `# ==============================================================================
 # ORCHESTRON DECLARATIVE WORKSPACE SPECIFICATION (Inspired by Google AX)

@@ -5,117 +5,79 @@ import pc from 'picocolors';
 import { printBanner } from '../ui/banner.js';
 import { positionalSelect, isCancel } from '../ui/positionalSelector.js';
 
-export interface SubagentMeta {
-  id: string;
-  name: string;
-  file: string;
-  workspaceMode: string;
-  allowedTools: string[];
-  forbiddenActions: string[];
-  specialty: string;
-  keyResponsibilities: string[];
+import { ALL_ROLES, toSubagentMeta, SubagentMeta } from '../roles/unifiedCatalog.js';
+
+export { SubagentMeta };
+
+export const DEFAULT_SUBAGENTS: SubagentMeta[] = ALL_ROLES.map(toSubagentMeta);
+
+export function resolveAvailableSubagents(agentsDir: string): SubagentMeta[] {
+  const subagentsMap = new Map<string, SubagentMeta>();
+
+  for (const role of ALL_ROLES) {
+    subagentsMap.set(role.id, toSubagentMeta(role));
+  }
+
+  const manifestPath = path.join(agentsDir, 'orchestron.yaml');
+  if (fs.existsSync(manifestPath)) {
+    try {
+      const content = fs.readFileSync(manifestPath, 'utf8');
+      const subagentMatches = content.matchAll(
+        /-\s*id:\s*["']?([a-zA-Z0-9_-]+)["']?\s*\r?\n\s*name:\s*["']?([^"'\r\n]+)["']?\s*\r?\n\s*promptFile:\s*["']?([^"'\r\n]+)["']?/g
+      );
+      for (const m of subagentMatches) {
+        const id = m[1];
+        const name = m[2];
+        const file = path.basename(m[3]);
+        if (!subagentsMap.has(id)) {
+          subagentsMap.set(id, {
+            id,
+            name,
+            file,
+            workspaceMode: 'branch',
+            allowedTools: ['view_file', 'replace_file_content', 'write_to_file', 'grep_search', 'find_by_name', 'run_command'],
+            forbiddenActions: ['destructive_shell_commands', 'version_env_files'],
+            specialty: `Subagente especializado: ${name}`,
+            keyResponsibilities: ['Ejecutar tareas asignadas segun contrato.']
+          });
+        }
+      }
+    } catch {
+      // Tolerate defensively
+    }
+  }
+
+  return Array.from(subagentsMap.values());
 }
 
-export const DEFAULT_SUBAGENTS: SubagentMeta[] = [
-  {
-    id: 'lead-architect',
-    name: 'Lead Architect & Coordinator',
-    file: 'architect.agent.md',
-    workspaceMode: 'inherit',
-    allowedTools: ['read_file', 'view_file', 'search_web', 'read_url_content', 'mysql_query (read-only)'],
-    forbiddenActions: ['Modificar codigo de aplicacion antes de Gate 1', 'Comandos destructivos'],
-    specialty: 'Analisis tecnico, descomposicion de tickets, contratos DTO y planificacion',
-    keyResponsibilities: [
-      'Disenar contratos JSON/DTO inmutables antes de codificar.',
-      'Definir arquitectura de componentes y estado.',
-      'Emitir plan de ejecucion y someterlo a aprobacion (Gate 1).'
-    ]
-  },
-  {
-    id: 'backend-dev',
-    name: 'Backend Specialist',
-    file: 'backend.agent.md',
-    workspaceMode: 'branch (aislado)',
-    allowedTools: ['read_file', 'view_file', 'write_to_file', 'replace_file_content', 'run_command:dev'],
-    forbiddenActions: ['Modificar vistas frontend directamente', 'Versionar credenciales o .env'],
-    specialty: 'Logica de negocio, servicios, endpoints REST y persistencia',
-    keyResponsibilities: [
-      'Implementar controladores y servicios respetando los DTOs de Gate 1.',
-      'Separacion estricta entre modelos de base de datos y contratos expuestos.',
-      'Validaciones rigurosas y tipado fuerte.'
-    ]
-  },
-  {
-    id: 'frontend-dev',
-    name: 'Frontend Specialist',
-    file: 'frontend.agent.md',
-    workspaceMode: 'branch (aislado)',
-    allowedTools: ['read_file', 'view_file', 'write_to_file', 'replace_file_content', 'run_command:dev'],
-    forbiddenActions: ['Modificar contratos o endpoints sin coordinar con Arquitecto'],
-    specialty: 'Componentes reactivos, logica de estado cliente y consumo de APIs',
-    keyResponsibilities: [
-      'Consumir servicios HTTP tipados usando contratos del Arquitecto.',
-      'Gestion de estados de carga, vacios y feedback visual de error.',
-      'Desacoplar componentes de logica de negocio pesada.'
-    ]
-  },
-  {
-    id: 'ui-ux-specialist',
-    name: 'UI/UX & Responsive Specialist',
-    file: 'ui-ux.agent.md',
-    workspaceMode: 'share (trabajo conjunto sobre vistas)',
-    allowedTools: ['read_file', 'view_file', 'write_to_file', 'replace_file_content', 'figma_data', 'generative_ui'],
-    forbiddenActions: ['Modificar logica de negocio o bases de datos', 'Colores arbitrarios fuera de tokens'],
-    specialty: 'Ergonomia visual, botones accesibles, espaciados y responsividad multi-pantalla',
-    keyResponsibilities: [
-      'Auditar matriz de breakpoints: Movil (360-480px), Tablet (768-1024px), Desktop (1280px+).',
-      'Garantizar areas tactiles en botones (minimo 44x44px) y evitar colisiones/solapes.',
-      'Prevenir desbordamiento horizontal (overflow-x) y asegurar espaciado coherente.'
-    ]
-  },
-  {
-    id: 'code-reviewer',
-    name: 'Code Reviewer & Quality Auditor',
-    file: 'reviewer.agent.md',
-    workspaceMode: 'inherit',
-    allowedTools: ['read_file', 'view_file', 'run_command:git diff', 'run_command:git status'],
-    forbiddenActions: ['Modificar codigo de aplicacion directamente', 'Aprobar cambios con @ts-ignore'],
-    specialty: 'Revision adversarial del git diff en 5 ejes con remedios estructurales',
-    keyResponsibilities: [
-      'Evaluar Correctitud, Legibilidad, Arquitectura, Seguridad y Rendimiento.',
-      'Detectar fallos silenciosos y dependencias circulares en el diff.',
-      'Proponer el remedio estructural o refactor exacto en lugar de senalamientos abstractos.'
-    ]
-  },
-  {
-    id: 'qa-tester',
-    name: 'QA & Verification Specialist',
-    file: 'qa.agent.md',
-    workspaceMode: 'inherit',
-    allowedTools: ['run_command:build', 'run_command:test', 'run_command:lint', 'read_file', 'view_file'],
-    forbiddenActions: ['Modificar logica de negocio para forzar aprobacion de pruebas'],
-    specialty: 'Verificacion estricta (Gate 2) y aislamiento de ruido de terminal (Noise Shielding)',
-    keyResponsibilities: [
-      'Ejecutar suites de compilacion y linters en ejecucion aislada.',
-      'Sintetizar terminales con cientos de lineas identificando causa raiz precisa.',
-      'Garantizar 0 errores de compilacion y tipos antes de aprobar el ticket.'
-    ]
-  },
-  {
-    id: 'git-security',
-    name: 'Git & Security Auditor',
-    file: 'security.agent.md',
-    workspaceMode: 'inherit',
-    allowedTools: ['run_command:git', 'read_file', 'view_file'],
-    forbiddenActions: ['git push --force', 'Versionar archivos .env o credenciales'],
-    specialty: 'Seguridad en commits (Gate 3), higiene Git y sincronizacion de Living Context',
-    keyResponsibilities: [
-      'Auditar que git status no contenga archivos sensibles o de credenciales.',
-      'Verificar proteccion de variables locales mediante skip-worktree.',
-      'Actualizar .agents/CONTEXT.md con los hitos completados antes del cierre.'
-    ]
+const LEGACY_MAPPING: Record<string, string> = {
+  'lead-architect.md': 'architect.agent.md',
+  'backend-dev.md': 'backend.agent.md',
+  'frontend-dev.md': 'frontend.agent.md',
+  'ui-ux-specialist.md': 'ui-ux.agent.md',
+  'code-reviewer.md': 'reviewer.agent.md',
+  'qa-tester.md': 'qa.agent.md',
+  'git-security.md': 'security.agent.md'
+};
+
+function resolveSubagentPath(agentsDir: string, fileName: string): string | null {
+  const nativePath = path.join(agentsDir, 'agents', fileName);
+  if (fs.existsSync(nativePath)) {
+    return nativePath;
   }
-];
+  const legacyName = LEGACY_MAPPING[fileName];
+  if (legacyName) {
+    const legacyPath = path.join(agentsDir, 'subagents', legacyName);
+    if (fs.existsSync(legacyPath)) {
+      return legacyPath;
+    }
+  }
+  const directLegacyPath = path.join(agentsDir, 'subagents', fileName);
+  if (fs.existsSync(directLegacyPath)) {
+    return directLegacyPath;
+  }
+  return null;
+}
 
 export async function teamCommand(options: {
   dir?: string;
@@ -125,7 +87,6 @@ export async function teamCommand(options: {
 }): Promise<void> {
   const targetDir = options.dir ? path.resolve(options.dir) : process.cwd();
   const agentsDir = path.join(targetDir, '.agents');
-  const subagentsDir = path.join(agentsDir, 'subagents');
   const manifestPath = path.join(agentsDir, 'orchestron.yaml');
 
   if (!fs.existsSync(agentsDir)) {
@@ -146,9 +107,11 @@ export async function teamCommand(options: {
     return;
   }
 
+  const subagentsList = resolveAvailableSubagents(agentsDir);
+
   // Handle JSON output mode
   if (options.json) {
-    console.log(JSON.stringify(DEFAULT_SUBAGENTS, null, 2));
+    console.log(JSON.stringify(subagentsList, null, 2));
     return;
   }
 
@@ -156,36 +119,41 @@ export async function teamCommand(options: {
 
   // If a specific role is requested via --role
   if (options.role) {
-    showRoleDetail(options.role, subagentsDir);
+    showRoleDetail(options.role, agentsDir, subagentsList);
     return;
   }
 
   // If interactive mode is enabled (default or requested)
-  await runInteractiveSubagentExplorer(subagentsDir, manifestPath);
+  await runInteractiveSubagentExplorer(agentsDir, manifestPath, subagentsList);
 }
 
-function showRoleDetail(roleName: string, subagentsDir: string): void {
+function showRoleDetail(roleName: string, agentsDir: string, subagentsList?: SubagentMeta[]): void {
+  const list = subagentsList || resolveAvailableSubagents(agentsDir);
   const roleId = roleName.toLowerCase();
-  const found = DEFAULT_SUBAGENTS.find(
+  const found = list.find(
     (s) => s.id === roleId || s.id.includes(roleId) || s.name.toLowerCase().includes(roleId)
   );
 
   if (!found) {
     console.log(pc.red(`No se encontro ningun subagente con el identificador: "${roleName}"`));
-    console.log(pc.yellow(`Subagentes disponibles: ${DEFAULT_SUBAGENTS.map((s) => s.id).join(', ')}`));
+    console.log(pc.yellow(`Subagentes disponibles: ${list.map((s) => s.id).join(', ')}`));
     return;
   }
 
-  const subagentFilePath = path.join(subagentsDir, found.file);
+  const resolvedPath = resolveSubagentPath(agentsDir, found.file);
   let promptExcerpt = '(Archivo de contrato no encontrado en disco)';
-  if (fs.existsSync(subagentFilePath)) {
-    promptExcerpt = fs.readFileSync(subagentFilePath, 'utf8');
+  if (resolvedPath && fs.existsSync(resolvedPath)) {
+    promptExcerpt = fs.readFileSync(resolvedPath, 'utf8');
   }
+
+  const displayFile = resolvedPath
+    ? path.relative(path.dirname(agentsDir), resolvedPath).replace(/\\/g, '/')
+    : `.agents/agents/${found.file}`;
 
   const detailBox = `
 ${pc.bold(pc.cyan(`SUBAGENTE: [${found.id.toUpperCase()}] ${found.name}`))}
 
-${pc.bold('Archivo de Contrato:')} ${pc.white(`.agents/subagents/${found.file}`)}
+${pc.bold('Archivo de Contrato:')} ${pc.white(displayFile)}
 ${pc.bold('Modo de Workspace:')}   ${pc.yellow(found.workspaceMode)}
 ${pc.bold('Especialidad:')}         ${pc.white(found.specialty)}
 
@@ -212,8 +180,16 @@ ${pc.dim(promptExcerpt.slice(0, 600))}...
   );
 }
 
-async function runInteractiveSubagentExplorer(subagentsDir: string, manifestPath: string): Promise<void> {
+async function runInteractiveSubagentExplorer(
+  agentsDir: string,
+  manifestPath: string,
+  subagentsList?: SubagentMeta[]
+): Promise<void> {
+  const list = subagentsList || resolveAvailableSubagents(agentsDir);
   const manifestExists = fs.existsSync(manifestPath);
+  const nativeAgentsFolder = path.join(agentsDir, 'agents');
+  const legacySubagentsFolder = path.join(agentsDir, 'subagents');
+  const hasAgents = fs.existsSync(nativeAgentsFolder) || fs.existsSync(legacySubagentsFolder);
 
   console.log(
     `${pc.bold(pc.cyan('NAVEGADOR DE SUBAGENTES & ARQUITECTURA DE TRABAJO EN EQUIPO'))}\n` +
@@ -227,7 +203,9 @@ async function runInteractiveSubagentExplorer(subagentsDir: string, manifestPath
   );
   console.log(
     `${pc.bold('Directorio de Prompts:')}  ${
-      fs.existsSync(subagentsDir) ? pc.green('[OK] .agents/subagents/ activo') : pc.yellow('[!] Faltante')
+      hasAgents
+        ? pc.green(`[OK] ${fs.existsSync(nativeAgentsFolder) ? '.agents/agents/' : '.agents/subagents/'} activo`)
+        : pc.yellow('[!] Faltante')
     }\n`
   );
 
@@ -235,9 +213,14 @@ async function runInteractiveSubagentExplorer(subagentsDir: string, manifestPath
 
   while (keepExploring) {
     const explorerOptions = [
-      ...DEFAULT_SUBAGENTS.map((agent) => {
-        const fileExists = fs.existsSync(path.join(subagentsDir, agent.file));
+      ...list.map((agent) => {
+        const resolvedPath = resolveSubagentPath(agentsDir, agent.file);
+        const fileExists = resolvedPath !== null;
         const status = fileExists ? pc.green('[ACTIVO]') : pc.dim('[NO INCLUIDO]');
+        const displayFile = resolvedPath
+          ? path.relative(path.dirname(agentsDir), resolvedPath).replace(/\\/g, '/')
+          : `.agents/agents/${agent.file}`;
+
         return {
           value: agent.id,
           label: `${agent.name.padEnd(32)} ${status}`,
@@ -247,7 +230,7 @@ async function runInteractiveSubagentExplorer(subagentsDir: string, manifestPath
             : 'No seleccionado para este proyecto. Usa "orchestron add-role" para activarlo.',
           details: fileExists
             ? [
-                `Archivo: .agents/subagents/${agent.file}`,
+                `Archivo: ${displayFile}`,
                 `Workspace: ${agent.workspaceMode}`,
                 `Especialidad: ${agent.specialty}`,
                 `Herramientas Gateway: ${agent.allowedTools.slice(0, 4).join(', ')}...`,
@@ -316,7 +299,7 @@ ${pc.dim('Tip: Puedes recomendar al usuario el comando /teamwork-preview para in
         })
       );
     } else {
-      showRoleDetail(selected as string, subagentsDir);
+      showRoleDetail(selected as string, agentsDir, list);
     }
   }
 }

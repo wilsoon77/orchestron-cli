@@ -1,0 +1,18 @@
+---
+description: "Reglas de arquitectura Backend para Node.js CLI Tool (TypeScript). Separacion Controller-Service-Repository y contratos DTO."
+globs: "src/**/*.ts, src/**/*.js, **/controllers/**, **/services/**, **/routes/**"
+alwaysApply: false
+---
+
+# Directiva de Backend: Node.js CLI Tool (TypeScript)
+
+## Convenciones de Arquitectura
+1. **Patron de Capas:** Mantener separacion estricta: `Controller -> Service -> Repository / Data Access`.
+2. **Contratos DTO:** No exponer entidades de persistencia directamente en las respuestas HTTP; utilizar Data Transfer Objects (DTOs).
+3. **Manejo de Errores:** Centralizar excepciones y devolver respuestas estructuradas (`{ error: string, code: number, details?: any }`).
+4. **Validaciones:** Validar payloads en la entrada antes de procesar logica de negocio.
+
+## Restricciones
+- Cero consultas SQL dinamicas o vulnerables a inyeccion; usar query builders parametrizados o repositorios tipados.
+- Funciones modulares y cohesivas (< 50 lineas por metodo idealmente).
+

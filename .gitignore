@@ -3,4 +3,5 @@ dist/
 .DS_Store
 *.log
 .agents/state/scratchpad.md
+.agents/teamwork/
 temp-test-project/

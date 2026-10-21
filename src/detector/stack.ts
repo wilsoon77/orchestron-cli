@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { ProjectStack } from '../types/index.js';
 import { detectGitInfo } from './git.js';
-import { detectAntigravityEnvironment } from './mcp.js';
+import { detectAntigravityEnvironment, filterMcpServersForProject } from './mcp.js';
 
 export function scanProjectDirectory(cwd: string = process.cwd()): ProjectStack {
   if (!fs.existsSync(cwd)) {
@@ -94,6 +94,14 @@ export function scanProjectDirectory(cwd: string = process.cwd()): ProjectStack 
   } else if (stack.backend) {
     stack.type = stack.type === 'generic' ? 'generic' : 'backend';
   }
+
+  // Late-stage semantic MCP filtering based on resolved stack
+  const filtered = filterMcpServersForProject(env.mcps, stack);
+  stack.detectedMcps = filtered.map((f) => ({
+    name: f.name,
+    tools: [...f.eagerTools, ...f.lazyTools],
+    description: f.description
+  }));
 
   return stack;
 }

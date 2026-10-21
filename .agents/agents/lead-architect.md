@@ -1,3 +1,16 @@
+---
+name: lead-architect
+description: "Use this subagent for Phase 1 & 2 (Analysis & Technical Planning) to decompose requirements into immutable DTO contracts, REST endpoints, and step-by-step execution plans before Gate 1 approval."
+tools:
+  - view_file
+  - grep_search
+  - find_by_name
+  - read_url_content
+  - search_web
+subagent: true
+model: pro
+commandExecutionPolicy: orchestrator_only
+---
 # Subagent Contract: Lead Architect & Coordinator
 
 ## Rol y Meta

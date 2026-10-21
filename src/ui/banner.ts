@@ -29,7 +29,7 @@ export function printBanner(): void {
     } else if (i === 3) {
       textSide = pc.dim('Quality Gates & Living Context System');
     } else if (i === 4) {
-      textSide = pc.dim('v1.0.0 · Antigravity / Claude Code / Cursor');
+      textSide = pc.dim('v2.0.0 · Antigravity / Claude Code / Cursor');
     }
 
     console.log(`  ${renderedLogoPart}   ${textSide}`);

@@ -142,76 +142,11 @@ Consulta los prompts detallados de cada subagente en `.agents/subagents/*.agent.
 ## 6. Contratos de Herramientas y Servidores MCP
 
 Los agentes de IA cuentan con acceso a herramientas externas mediante MCP (Model Context Protocol):
-
-### Servidor MCP: `atlassian-mcp-server`
-- **Descripcion:** External integration server
-- **Herramientas disponibles:** `addTeamworkGraphContext`, `getContentFormatGuide`, `getTeamworkGraphContext`, `getTeamworkGraphObject`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `chrome_devtools`
-- **Descripcion:** External integration server
-- **Herramientas disponibles:** `click`, `close_page`, `drag`, `emulate`, `evaluate_script`, `fill`, `fill_form`, `get_console_message`, `get_network_request`, `handle_dialog`, `hover`, `lighthouse_audit`, `list_console_messages`, `list_network_requests`, `list_pages`, `navigate_page`, `new_page`, `performance_analyze_insight`, `performance_start_trace`, `performance_stop_trace`, `press_key`, `resize_page`, `screencast_start`, `screencast_stop`, `select_page`, `take_heapsnapshot`, `take_screenshot`, `take_snapshot`, `type_text`, `upload_file`, `wait_for`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `ClickUp`
-- **Descripcion:** External integration server
-- **Herramientas disponibles:** `add_bulk_dependencies`, `add_tag_to_task`, `add_task_dependency`, `add_time_entry`, `attach_task_file`, `create_bulk_tasks`, `create_folder`, `create_list`, `create_list_in_folder`, `create_task`, `create_task_comment`, `delete_bulk_tasks`, `delete_folder`, `delete_list`, `delete_task`, `delete_time_entry`, `duplicate_task`, `find_member_by_name`, `get_current_time_entry`, `get_folder`, `get_list`, `get_space_tags`, `get_task`, `get_task_comments`, `get_task_dependencies`, `get_task_time_entries`, `get_workspace_hierarchy`, `get_workspace_members`, `get_workspace_tasks`, `move_bulk_tasks`, `move_task`, `remove_tag_from_task`, `remove_task_dependency`, `resolve_assignees`, `start_time_tracking`, `stop_time_tracking`, `update_bulk_tasks`, `update_folder`, `update_list`, `update_task`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
 ### Servidor MCP: `context7`
 - **Descripcion:** External integration server
 - **Herramientas disponibles:** `query-docs`, `resolve-library-id`
 - **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `figma-developer-mcp`
-- **Descripcion:** Figma design tokens and UI mockups extractor
-- **Herramientas disponibles:** `download_figma_images`, `get_figma_data`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `mcp-server-neon`
-- **Descripcion:** PostgreSQL / Neon cloud database management
-- **Herramientas disponibles:** `add_auth_oauth_provider`, `add_auth_trusted_domain`, `compare_database_schema`, `complete_database_migration`, `complete_query_tuning`, `create_auth_user`, `create_branch`, `create_credential`, `create_postgres_database`, `create_postgres_endpoint`, `create_postgres_role`, `create_project`, `create_snapshot`, `create_storage_bucket`, `create_trigger`, `delete_auth_oauth_provider`, `delete_auth_trusted_domain`, `delete_auth_user`, `delete_branch`, `delete_data_api`, `delete_function`, `delete_functions_custom_domain`, `delete_postgres_database`, `delete_postgres_endpoint`, `delete_postgres_role`, `delete_project`, `delete_snapshot`, `delete_storage_bucket`, `delete_storage_object`, `delete_storage_objects_by_prefix`, `delete_trigger`, `deploy_function`, `describe_branch`, `describe_project`, `describe_table_schema`, `disable_auth`, `explain_sql_statement`, `fetch`, `finalize_branch_restore`, `get_ai_gateway`, `get_auth`, `get_branch`, `get_connection_string`, `get_database_tables`, `get_data_api`, `get_default_branch`, `get_doc_resource`, `get_function`, `get_neon_auth_config`, `get_operation`, `get_postgres_database`, `get_postgres_endpoint`, `get_postgres_role`, `get_snapshot_schedule`, `get_storage`, `get_trigger`, `inspect_database`, `list_auth_oauth_providers`, `list_auth_trusted_domains`, `list_branches`, `list_branch_computes`, `list_credentials`, `list_docs_resources`, `list_functions`, `list_functions_custom_domains`, `list_log_fields`, `list_log_field_values`, `list_operations`, `list_organizations`, `list_postgres_databases`, `list_postgres_endpoints`, `list_postgres_roles`, `list_projects`, `list_project_members`, `list_project_permissions`, `list_regions`, `list_slow_queries`, `list_snapshots`, `list_storage_buckets`, `list_storage_objects`, `list_triggers`, `prepare_database_migration`, `prepare_query_tuning`, `presign_storage_object`, `provision_neon_auth`, `provision_neon_data_api`, `query_logs`, `recover_project`, `register_functions_custom_domain`, `reset_from_parent`, `reset_postgres_role_password`, `restart_postgres_endpoint`, `restore_snapshot`, `revoke_credential`, `rotate_credential`, `run_sql`, `run_sql_transaction`, `search`, `send_feedback`, `set_default_branch`, `set_snapshot_schedule`, `start_postgres_endpoint`, `suspend_postgres_endpoint`, `update_auth_config`, `update_auth_oauth_provider`, `update_auth_user_role`, `update_branch`, `update_data_api`, `update_function`, `update_postgres_database`, `update_postgres_endpoint`, `update_project`, `update_snapshot`, `update_trigger`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `mysql-local`
-- **Descripcion:** Local MySQL database inspector and query execution
-- **Herramientas disponibles:** `mysql_query`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `notion-mcp-server`
-- **Descripcion:** Task management & documentation sync
-- **Herramientas disponibles:** `API-create-a-comment`, `API-create-a-data-source`, `API-delete-a-block`, `API-get-block-children`, `API-get-self`, `API-get-user`, `API-get-users`, `API-list-data-source-templates`, `API-move-page`, `API-patch-block-children`, `API-patch-page`, `API-post-page`, `API-post-search`, `API-query-data-source`, `API-retrieve-a-block`, `API-retrieve-a-comment`, `API-retrieve-a-data-source`, `API-retrieve-a-database`, `API-retrieve-a-page-property`, `API-retrieve-a-page`, `API-retrieve-page-markdown`, `API-update-a-block`, `API-update-a-data-source`, `API-update-page-markdown`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `StitchMCP`
-- **Descripcion:** External integration server
-- **Herramientas disponibles:** `apply_design_system`, `create_design_system`, `create_design_system_from_design_md`, `create_project`, `delete_project`, `edit_screens`, `generate_screen_from_text`, `generate_variants`, `get_project`, `get_screen`, `list_design_systems`, `list_projects`, `list_screens`, `update_design_system`, `upload_design_md`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
-
-### Servidor MCP: `supabase`
-- **Descripcion:** Supabase backend & database tools
-- **Herramientas disponibles:** `apply_migration`, `create_branch`, `create_project`, `delete_branch`, `deploy_edge_function`, `execute_sql`, `generate_typescript_types`, `get_advisors`, `get_edge_function`, `get_organization`, `get_project`, `get_project_url`, `get_publishable_keys`, `list_branches`, `list_edge_functions`, `list_extensions`, `list_migrations`, `list_organizations`, `list_projects`, `list_tables`, `merge_branch`, `pause_project`, `query_logs`, `rebase_branch`, `reset_branch`, `restore_project`, `search_docs`
-- **Reglas de Acceso:**
-  1. Durante la fase de **Analisis y Planificacion**, unicamente ejecutar operaciones de lectura/inspeccion (ej. `SELECT` o consultas GET).
-  2. Modificaciones estructurales o cambios de esquema deben disenarse primero como scripts de migracion versionables.
+  1. Consultas tecnicas de solo lectura sobre documentacion oficial de bibliotecas y frameworks.
 
 
 ---

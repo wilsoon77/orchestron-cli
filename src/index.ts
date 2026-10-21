@@ -10,6 +10,7 @@ import { completionCommand } from './commands/completion.js';
 import { teamCommand } from './commands/team.js';
 import { updateCommand } from './commands/update.js';
 import { learnCommand } from './commands/learn.js';
+import { hooksCommand } from './commands/hooks.js';
 import { interactivePaletteCommand } from './commands/palette.js';
 
 const program = new Command();
@@ -19,7 +20,7 @@ program
   .description(
     'ORCHESTRON CLI — Autonomous AI Agent Team, Quality Gates & Living Context Orchestrator'
   )
-  .version('1.1.0');
+  .version('2.0.0');
 
 program
   .command('init')
@@ -34,6 +35,7 @@ program
   .command('update')
   .description('Actualizar el ecosistema de agentes con nuevas capacidades sin sobreescribir CONTEXT.md')
   .option('-d, --dir <path>', 'Directorio objetivo del proyecto (por defecto: actual)')
+  .option('-n, --dry-run', 'Simular la actualizacion mostrando los cambios sin modificar el disco')
   .action(async (options) => {
     await updateCommand(options);
   });
@@ -71,14 +73,27 @@ program
   .command('doctor')
   .description('Auditar la salud de la configuracion, limites de contexto y seguridad Git')
   .option('-d, --dir <path>', 'Directorio objetivo del proyecto')
+  .option('--ci', 'Modo integracion continua: salida silenciosa y codigo de salida 1 ante fallos')
+  .option('--json', 'Salida estructurada en JSON')
   .action((options) => {
     doctorCommand(options);
+  });
+
+program
+  .command('hooks')
+  .description('Instalar o gestionar hooks deterministas de calidad en Git o Claude Code')
+  .option('-i, --install', 'Instalar hook pre-commit en .git/hooks/')
+  .option('-u, --uninstall', 'Desinstalar hook pre-commit')
+  .option('-d, --dir <path>', 'Directorio objetivo del proyecto')
+  .action((options) => {
+    hooksCommand(options);
   });
 
 program
   .command('add-role')
   .description('Incorporar un nuevo rol de agente (DevOps, Mobile, Custom) al equipo')
   .option('-d, --dir <path>', 'Directorio objetivo del proyecto')
+  .option('-r, --role <id>', 'Identificador del rol a incorporar (ej: devops-infra)')
   .action(async (options) => {
     await addRoleCommand(options);
   });

@@ -45,6 +45,14 @@
 
 *Esta seccion es mantenida activamente por los agentes de IA al concluir tareas:*
 
+### [2026-10-21] — Correccion de Formato Globs en Frontmatter YAML para Google Antigravity
+- **Autor / Rol:** Lead Architect & Backend Specialist
+- **Cambios Realizados:**
+  - Ajuste en `src/generator/templates/rulesTemplates.ts`: conversion de arrays JSON (`globs: ["..."]`) a strings separados por coma (`globs: "**/*.ts, **/*.js, ..."`) para satisfacer el unmarshaler en Go de Google Antigravity (`cannot unmarshal !!seq into string`).
+  - Actualizacion de reglas locales en `.agents/rules/` (`backend.md`, `database.md`, `security.md`).
+  - Deteccion y reparacion automatica en `orchestron update` para corregir proyectos con formato de secuencia previo.
+  - Sincronizacion de suites de pruebas Vitest (`tests/e2e/challenger-m1-adversarial.test.ts` y `tests/empirical-challenger-m1.ts`) manteniendo 100% de aserciones en verde (87/87 tests).
+
 ### [2026-10-21] — Lanzamiento de Orchestron CLI v2.0 (Resolucion Integral de Auditoria Arquitectonica)
 - **Autor / Rol:** Lead Architect, Backend Specialist & QA Specialist
 - **Cambios Realizados:**

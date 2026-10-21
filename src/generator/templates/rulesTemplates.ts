@@ -18,12 +18,12 @@ export function renderBackendRule(config: OrchestronConfig): string {
     globs.unshift(`${b.directory}/**`);
   }
 
-  const globsJson = JSON.stringify(globs);
+  const globsStr = globs.join(', ');
   const description = `Convenciones de arquitectura Backend para ${fw} (${lang}): patron de capas Controller-Service-Repository, contratos DTO y validaciones.`;
 
   return `---
 trigger: glob
-globs: ${globsJson}
+globs: "${globsStr}"
 description: "${description}"
 ---
 
@@ -58,12 +58,12 @@ export function renderFrontendRule(config: OrchestronConfig): string {
     globs.unshift(`${f.directory}/**`);
   }
 
-  const globsJson = JSON.stringify(globs);
+  const globsStr = globs.join(', ');
   const description = `Convenciones de arquitectura Frontend para ${fw}: diseno responsive, desacoplamiento de componentes y gestion de estados.`;
 
   return `---
 trigger: glob
-globs: ${globsJson}
+globs: "${globsStr}"
 description: "${description}"
 ---
 
@@ -92,12 +92,12 @@ export function renderDatabaseRule(config: OrchestronConfig): string {
     globs = ['**/*.sql', db.dumpFile, '**/migrations/**'];
   }
 
-  const globsJson = JSON.stringify(globs);
+  const globsStr = globs.join(', ');
   const description = `Directiva de base de datos (${engine}): integridad referencial, migraciones versionadas y politicas de consulta.`;
 
   return `---
 trigger: glob
-globs: ${globsJson}
+globs: "${globsStr}"
 description: "${description}"
 ---
 
@@ -115,12 +115,12 @@ ${db?.hasDump ? `4. **Dump de Referencia:** El archivo \`${db.dumpFile}\` sirve 
 
 export function renderSecurityRule(_config: OrchestronConfig): string {
   const globs = ['**/.env*', '**/secrets/**', '**/*.pem', '**/*.key', '**/.gitignore'];
-  const globsJson = JSON.stringify(globs);
+  const globsStr = globs.join(', ');
   const description = 'Directiva de seguridad: proteccion de secretos, variables de entorno (.env), llaves privadas y tecnica skip-worktree.';
 
   return `---
 trigger: model_decision
-globs: ${globsJson}
+globs: "${globsStr}"
 description: "${description}"
 ---
 

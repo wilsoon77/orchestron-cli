@@ -1,6 +1,6 @@
 ---
 trigger: model_decision
-globs: ["**/.env*","**/secrets/**","**/*.pem","**/*.key","**/.gitignore"]
+globs: "**/.env*, **/secrets/**, **/*.pem, **/*.key, **/.gitignore"
 description: "Directiva de seguridad: proteccion de secretos, variables de entorno (.env), llaves privadas y tecnica skip-worktree."
 ---
 

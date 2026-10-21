@@ -131,7 +131,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
       expect(frontmatter.trigger).toBe('glob');
       expect(frontmatter.globs).toBeDefined();
       expect(frontmatter.description).toBeDefined();
-      const parsedGlobs = JSON.parse(frontmatter.globs);
+      const parsedGlobs = frontmatter.globs.split(',').map((s) => s.trim());
       expect(Array.isArray(parsedGlobs)).toBe(true);
       expect(parsedGlobs).toContain('src/server/**');
     });
@@ -145,7 +145,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
           git: { isRepo: true, defaultBranch: 'main' }
         }
       });
-      const javaGlobs = JSON.parse(parseFrontmatterSimple(renderBackendRule(javaCfg)).frontmatter.globs);
+      const javaGlobs = parseFrontmatterSimple(renderBackendRule(javaCfg)).frontmatter.globs.split(',').map((s) => s.trim());
       expect(javaGlobs).toContain('**/*.java');
       expect(javaGlobs).toContain('**/pom.xml');
 
@@ -157,7 +157,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
           git: { isRepo: true, defaultBranch: 'main' }
         }
       });
-      const pyGlobs = JSON.parse(parseFrontmatterSimple(renderBackendRule(pyCfg)).frontmatter.globs);
+      const pyGlobs = parseFrontmatterSimple(renderBackendRule(pyCfg)).frontmatter.globs.split(',').map((s) => s.trim());
       expect(pyGlobs).toContain('**/*.py');
 
       const goCfg = createDummyConfig({
@@ -168,7 +168,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
           git: { isRepo: true, defaultBranch: 'main' }
         }
       });
-      const goGlobs = JSON.parse(parseFrontmatterSimple(renderBackendRule(goCfg)).frontmatter.globs);
+      const goGlobs = parseFrontmatterSimple(renderBackendRule(goCfg)).frontmatter.globs.split(',').map((s) => s.trim());
       expect(goGlobs).toContain('**/*.go');
     });
 
@@ -181,7 +181,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
           git: { isRepo: true, defaultBranch: 'main' }
         }
       });
-      const angGlobs = JSON.parse(parseFrontmatterSimple(renderFrontendRule(angularCfg)).frontmatter.globs);
+      const angGlobs = parseFrontmatterSimple(renderFrontendRule(angularCfg)).frontmatter.globs.split(',').map((s) => s.trim());
       expect(angGlobs).toContain('**/*.ts');
       expect(angGlobs).toContain('**/*.html');
 
@@ -193,7 +193,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
           git: { isRepo: true, defaultBranch: 'main' }
         }
       });
-      const vueGlobs = JSON.parse(parseFrontmatterSimple(renderFrontendRule(vueCfg)).frontmatter.globs);
+      const vueGlobs = parseFrontmatterSimple(renderFrontendRule(vueCfg)).frontmatter.globs.split(',').map((s) => s.trim());
       expect(vueGlobs).toContain('**/*.vue');
     });
 
@@ -206,7 +206,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
           git: { isRepo: true, defaultBranch: 'main' }
         }
       });
-      const prismaGlobs = JSON.parse(parseFrontmatterSimple(renderDatabaseRule(prismaCfg)).frontmatter.globs);
+      const prismaGlobs = parseFrontmatterSimple(renderDatabaseRule(prismaCfg)).frontmatter.globs.split(',').map((s) => s.trim());
       expect(prismaGlobs).toContain('**/schema.prisma');
 
       const dumpCfg = createDummyConfig({
@@ -217,7 +217,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
           git: { isRepo: true, defaultBranch: 'main' }
         }
       });
-      const dumpGlobs = JSON.parse(parseFrontmatterSimple(renderDatabaseRule(dumpCfg)).frontmatter.globs);
+      const dumpGlobs = parseFrontmatterSimple(renderDatabaseRule(dumpCfg)).frontmatter.globs.split(',').map((s) => s.trim());
       expect(dumpGlobs).toContain('db/schema.sql');
     });
 
@@ -226,7 +226,7 @@ describe('Challenger M1 Adversarial Suite (Empirical Verification)', () => {
       const sec = renderSecurityRule(cfg);
       const { frontmatter } = parseFrontmatterSimple(sec);
       expect(frontmatter.trigger).toBe('model_decision');
-      const secGlobs = JSON.parse(frontmatter.globs);
+      const secGlobs = frontmatter.globs.split(',').map((s) => s.trim());
       expect(secGlobs).toContain('**/.env*');
     });
 

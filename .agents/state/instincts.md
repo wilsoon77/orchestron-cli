@@ -8,6 +8,11 @@
 
 ## 1. Patrones de Resolucion de Errores (Error Resolution Patterns)
 
+### [2026-10-21] — Formato de Globs en Frontmatter de Reglas de Google Antigravity
+- **Disparador / Error:** `Rule *.md failed to parse frontmatter yaml: yaml: unmarshal errors: line 2: cannot unmarshal !!seq into string`
+- **Causa Raiz:** El deserializador YAML del motor Go en Google Antigravity mapea el campo `globs` de las reglas a un tipo `string`, no a una secuencia `[]string`. Los arrays de YAML `["..."]` fallan con error de tipado al deserializar (`!!seq`).
+- **Regla Aprendida / Solucion:** En `.agents/rules/*.md`, el campo `globs` debe definirse siempre como un string unico entrecomillado con valores separados por comas: `globs: "**/*.ts, **/*.js, **/package.json"`.
+
 ### [2026-10-06] — Fix tsup esm banner
 - **Disparador / Error:** Fix tsup esm banner
 - **Regla Aprendida / Solucion:** Configurar shims en tsup.config para evitar colisiones

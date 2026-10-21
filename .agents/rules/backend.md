@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: ["**/*.ts","**/*.js","**/package.json"]
+globs: "**/*.ts, **/*.js, **/package.json"
 description: "Convenciones de arquitectura Backend para Node.js CLI Tool (TypeScript): patron de capas Controller-Service-Repository, contratos DTO y validaciones."
 ---
 

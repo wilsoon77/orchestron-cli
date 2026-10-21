@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: ["**/*.sql","**/migrations/**","**/schema.prisma","**/db/**"]
+globs: "**/*.sql, **/migrations/**, **/schema.prisma, **/db/**"
 description: "Directiva de base de datos (Relacional / SQL): integridad referencial, migraciones versionadas y politicas de consulta."
 ---
 

@@ -159,8 +159,8 @@ runTest('R1.1: Backend rule frontmatter parses and contains trigger: glob + glob
   assert.strictEqual(frontmatter.trigger, 'glob');
   assert(frontmatter.globs, 'globs must be present');
   assert(frontmatter.description, 'description must be present');
-  const parsedGlobs = JSON.parse(frontmatter.globs);
-  assert(Array.isArray(parsedGlobs), 'globs must be a JSON array');
+  const parsedGlobs = frontmatter.globs.split(',').map((s) => s.trim());
+  assert(Array.isArray(parsedGlobs), 'globs must be an array');
   assert(parsedGlobs.includes('src/server/**'), 'custom directory must be prefixed');
 });
 
@@ -172,7 +172,7 @@ runTest('R1.2: Backend rule adapts globs across diverse stacks (Java, Python, Go
       commands: {}
     }
   });
-  const javaGlobs = JSON.parse(parseFrontmatterSimple(renderBackendRule(javaCfg)).frontmatter.globs);
+  const javaGlobs = parseFrontmatterSimple(renderBackendRule(javaCfg)).frontmatter.globs.split(',').map((s) => s.trim());
   assert(javaGlobs.includes('**/*.java'), 'Java globs missing **/*.java');
   assert(javaGlobs.includes('**/pom.xml'), 'Java globs missing **/pom.xml');
 
@@ -183,7 +183,7 @@ runTest('R1.2: Backend rule adapts globs across diverse stacks (Java, Python, Go
       commands: {}
     }
   });
-  const pyGlobs = JSON.parse(parseFrontmatterSimple(renderBackendRule(pyCfg)).frontmatter.globs);
+  const pyGlobs = parseFrontmatterSimple(renderBackendRule(pyCfg)).frontmatter.globs.split(',').map((s) => s.trim());
   assert(pyGlobs.includes('**/*.py'), 'Python globs missing **/*.py');
 
   const goCfg = createDummyConfig({
@@ -193,7 +193,7 @@ runTest('R1.2: Backend rule adapts globs across diverse stacks (Java, Python, Go
       commands: {}
     }
   });
-  const goGlobs = JSON.parse(parseFrontmatterSimple(renderBackendRule(goCfg)).frontmatter.globs);
+  const goGlobs = parseFrontmatterSimple(renderBackendRule(goCfg)).frontmatter.globs.split(',').map((s) => s.trim());
   assert(goGlobs.includes('**/*.go'), 'Go globs missing **/*.go');
 });
 
@@ -205,7 +205,7 @@ runTest('R1.3: Frontend rule adapts globs across diverse frameworks (Angular, Vu
       commands: {}
     }
   });
-  const angGlobs = JSON.parse(parseFrontmatterSimple(renderFrontendRule(angularCfg)).frontmatter.globs);
+  const angGlobs = parseFrontmatterSimple(renderFrontendRule(angularCfg)).frontmatter.globs.split(',').map((s) => s.trim());
   assert(angGlobs.includes('**/*.ts') && angGlobs.includes('**/*.html'), 'Angular globs incorrect');
 
   const vueCfg = createDummyConfig({
@@ -215,7 +215,7 @@ runTest('R1.3: Frontend rule adapts globs across diverse frameworks (Angular, Vu
       commands: {}
     }
   });
-  const vueGlobs = JSON.parse(parseFrontmatterSimple(renderFrontendRule(vueCfg)).frontmatter.globs);
+  const vueGlobs = parseFrontmatterSimple(renderFrontendRule(vueCfg)).frontmatter.globs.split(',').map((s) => s.trim());
   assert(vueGlobs.includes('**/*.vue'), 'Vue globs missing **/*.vue');
 });
 
@@ -227,7 +227,7 @@ runTest('R1.4: Database rule includes Prisma or Dump files when configured', () 
       commands: {}
     }
   });
-  const prismaGlobs = JSON.parse(parseFrontmatterSimple(renderDatabaseRule(prismaCfg)).frontmatter.globs);
+  const prismaGlobs = parseFrontmatterSimple(renderDatabaseRule(prismaCfg)).frontmatter.globs.split(',').map((s) => s.trim());
   assert(prismaGlobs.includes('**/schema.prisma'), 'Prisma schema missing from database globs');
 
   const dumpCfg = createDummyConfig({
@@ -237,7 +237,7 @@ runTest('R1.4: Database rule includes Prisma or Dump files when configured', () 
       commands: {}
     }
   });
-  const dumpGlobs = JSON.parse(parseFrontmatterSimple(renderDatabaseRule(dumpCfg)).frontmatter.globs);
+  const dumpGlobs = parseFrontmatterSimple(renderDatabaseRule(dumpCfg)).frontmatter.globs.split(',').map((s) => s.trim());
   assert(dumpGlobs.includes('db/schema.sql'), 'Dump file missing from database globs');
 });
 
@@ -246,7 +246,7 @@ runTest('R1.5: Security rule enforces trigger: model_decision and targets sensit
   const sec = renderSecurityRule(cfg);
   const { frontmatter } = parseFrontmatterSimple(sec);
   assert.strictEqual(frontmatter.trigger, 'model_decision');
-  const secGlobs = JSON.parse(frontmatter.globs);
+  const secGlobs = frontmatter.globs.split(',').map((s) => s.trim());
   assert(secGlobs.includes('**/.env*'), 'Security globs must protect .env* files');
 });
 

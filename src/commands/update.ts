@@ -353,11 +353,11 @@ export async function updateCommand(options: UpdateOptions): Promise<void> {
     }
   }
 
-  // 9. Update rules with YAML frontmatter if missing
+  // 9. Update rules with YAML frontmatter if missing or using invalid sequence format
   const backendRulePath = path.join(rulesDir, 'backend.md');
   if (fs.existsSync(backendRulePath)) {
     const content = fs.readFileSync(backendRulePath, 'utf8');
-    if (!content.trimStart().startsWith('---')) {
+    if (!content.trimStart().startsWith('---') || /globs:\s*\[/.test(content)) {
       if (!dryRun) fs.writeFileSync(backendRulePath, renderBackendRule(config), 'utf8');
       logs.push(`${pc.yellow(prefix + '[ACTUALIZADO]')} .agents/rules/backend.md (YAML frontmatter incorporado)`);
     }
@@ -366,7 +366,7 @@ export async function updateCommand(options: UpdateOptions): Promise<void> {
   const frontendRulePath = path.join(rulesDir, 'frontend.md');
   if (fs.existsSync(frontendRulePath)) {
     const content = fs.readFileSync(frontendRulePath, 'utf8');
-    if (!content.trimStart().startsWith('---')) {
+    if (!content.trimStart().startsWith('---') || /globs:\s*\[/.test(content)) {
       if (!dryRun) fs.writeFileSync(frontendRulePath, renderFrontendRule(config), 'utf8');
       logs.push(`${pc.yellow(prefix + '[ACTUALIZADO]')} .agents/rules/frontend.md (YAML frontmatter incorporado)`);
     }
@@ -375,7 +375,7 @@ export async function updateCommand(options: UpdateOptions): Promise<void> {
   const databaseRulePath = path.join(rulesDir, 'database.md');
   if (fs.existsSync(databaseRulePath)) {
     const content = fs.readFileSync(databaseRulePath, 'utf8');
-    if (!content.trimStart().startsWith('---')) {
+    if (!content.trimStart().startsWith('---') || /globs:\s*\[/.test(content)) {
       if (!dryRun) fs.writeFileSync(databaseRulePath, renderDatabaseRule(config), 'utf8');
       logs.push(`${pc.yellow(prefix + '[ACTUALIZADO]')} .agents/rules/database.md (YAML frontmatter incorporado)`);
     }
@@ -384,7 +384,7 @@ export async function updateCommand(options: UpdateOptions): Promise<void> {
   const securityRulePath = path.join(rulesDir, 'security.md');
   if (fs.existsSync(securityRulePath)) {
     const content = fs.readFileSync(securityRulePath, 'utf8');
-    if (!content.trimStart().startsWith('---')) {
+    if (!content.trimStart().startsWith('---') || /globs:\s*\[/.test(content)) {
       if (!dryRun) fs.writeFileSync(securityRulePath, renderSecurityRule(config), 'utf8');
       logs.push(`${pc.yellow(prefix + '[ACTUALIZADO]')} .agents/rules/security.md (YAML frontmatter incorporado)`);
     }
